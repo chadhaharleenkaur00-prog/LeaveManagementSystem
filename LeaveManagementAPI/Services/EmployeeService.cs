@@ -102,6 +102,40 @@ namespace LeaveManagementAPI.Services
                 }
             }
         }
+        public async Task<ServiceResult> DeleteEmployeeByIdAsync(int id)
+        {
+            if(_context.Employees is null)
+            {
+                return new ServiceResult{
+                    Success = false,
+                    Message = "No Employees found"
+                };
+            }
+            else
+            {
+                var employee = await _context.Employees.FindAsync(id);
+                if(employee is null)
+                {
+                    return new ServiceResult 
+                    {
+                        Success = false,
+                        Message = "Employee not found"
+                    };
+                }
+                else
+                {
+                    _context.Employees.Remove(employee);
+                    await _context.SaveChangesAsync();
+
+                    return new ServiceResult
+                    {
+                        Success = true,
+                        Message = "Employee has been deleted",
+                        Data = employee
+                    };
+                }
+            }
     }
 
+}
 }

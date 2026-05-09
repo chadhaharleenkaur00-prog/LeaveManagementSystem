@@ -25,5 +25,16 @@ namespace LeaveManagementAPI.Controllers
                 
             return Ok(result.Message);
         }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login(LoginDto dto)
+        {
+            var result = await _authService.LoginAsync(dto);
+
+            if (!result.Success)
+                return BadRequest(result.Message);
+
+            return Ok(result);
+        }
     }
 }

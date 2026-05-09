@@ -45,5 +45,15 @@ namespace LeaveManagementAPI.Controller
             }
             return BadRequest(result.Message);
         }
+    
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteEmployeeById(int id)
+        {
+            var result = await _employeeService.DeleteEmployeeByIdAsync(id);
+            if (result.Success)            {
+                return Ok(result.Data);}
+            return BadRequest(result.Message);
         }
     }
+}
+    
