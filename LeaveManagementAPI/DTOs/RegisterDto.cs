@@ -50,5 +50,18 @@ namespace LeaveManagementAPI.DTOs
         public int id { get; set; }
         public string Status { get; set; }
     }
+    public class LeaveBalanceDTO
+    {
+        public int EmployeeId { get; set; }
+        public int LeaveTypeId { get; set; }
+        public string EmployeeName { get; set; } = string.Empty;
+        public string LeaveType { get; set; } = string.Empty;
+        public int RemainingDays { get; set; }
+    }
+    public class UpdateLeaveBalanceDTO
+    {
+        public int Id { get; set; }
+        public int RemainingDays { get; set; }
+    }
 }
 

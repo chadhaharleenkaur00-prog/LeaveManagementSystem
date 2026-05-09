@@ -10,7 +10,7 @@ namespace LeaveManagementAPI.Services
         Task<ServiceResult> GetLeaveBalancesAsync();
         Task<ServiceResult> GetLeaveBalanceByIdAsync(int id);
         Task<ServiceResult> CreateLeaveBalanceAsync(LeaveBalanceDTO dto);
-        Task<ServiceResult> UpdateLeaveBalanceAsync(int id, LeaveBalanceDTO dto);
+        Task<ServiceResult> UpdateLeaveBalanceAsync(UpdateLeaveBalanceDTO dto);
         Task<ServiceResult> DeleteLeaveBalanceAsync(int id);
     }
 }
