@@ -37,4 +37,18 @@ namespace LeaveManagementAPI.DTOs
         public string Message { get; set; }
         public string Token { get; set; }
     }
+    public class LeaveRequestDTO
+    {
+        public int EmployeeId { get; set; }
+        public int LeaveTypeId { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+        public string Reason { get; set; } = string.Empty;
+    }
+    public class UpdateLeaveRequestStatusDTO
+    {
+        public int id { get; set; }
+        public string Status { get; set; }
+    }
 }
+
