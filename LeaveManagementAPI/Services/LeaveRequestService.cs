@@ -26,7 +26,28 @@ namespace LeaveManagementAPI.Services
             }
             else
             {
-                var leaveRequests = await _context.LeaveRequests.ToListAsync();
+                var leaveRequests = await _context.LeaveRequests
+                    .Include(lr => lr.Employee)
+                    .Include(lr => lr.LeaveType)
+                    .Select(lr => new
+                    {
+                        lr.Id,
+                        lr.EmployeeId,
+                        Employee = new
+                        {
+                            lr.Employee.Name
+                        },
+                        LeaveType = new
+                        {
+                            lr.LeaveType.TypeName
+                        },
+                        lr.StartDate,
+                        lr.EndDate,
+                        lr.Reason,
+                        lr.Status,
+                        lr.CreatedAt
+                    })
+                    .ToListAsync();
                 return new ServiceResult
                 {
                     Success = true,
@@ -47,8 +68,25 @@ namespace LeaveManagementAPI.Services
                 };
             }
             else {
-                var leaveRequest = await _context.LeaveRequests.FindAsync(id);
-                if(leaveRequest is null)
+                var leaveRequests = await _context.LeaveRequests
+                    .Where(lr => lr.EmployeeId == id)
+                    .Select(lr => new
+                    {
+                        lr.Id,
+                        lr.EmployeeId,
+                        LeaveType = new
+                        {
+                            lr.LeaveType.TypeName
+                        },
+                        lr.StartDate,
+                        lr.EndDate,
+                        lr.Reason,
+                        lr.Status,
+                        lr.CreatedAt
+                    })
+                    .ToListAsync();
+
+                if(!leaveRequests.Any())
                 {
                     return new ServiceResult
                     {
@@ -56,19 +94,21 @@ namespace LeaveManagementAPI.Services
                         Message = "Leave request not found"
                     };
                 }
+
                 return new ServiceResult
                 {
                     Success = true,
-                    Message = "Leave request retrieved successfully",
-                    Data = leaveRequest
+                    Message = "Leave requests retrieved successfully",
+                    Data = leaveRequests
                 };
             }
         }
 
         public async Task<ServiceResult> CreateLeaveRequestAsync(LeaveRequestDTO dto)
         {
-            var existingLeaveReq = await _context.LeaveRequests.FirstOrDefaultAsync(lr => lr.EmployeeId == dto.EmployeeId && lr.StartDate == dto.StartDate && lr.EndDate == dto.EndDate);
-            if(existingLeaveReq != null)            
+            Console.WriteLine("CreateLeaveRequestAsync HIT");
+            var existingLeaveReq = await _context.LeaveRequests.Where(lr => lr.EmployeeId == dto.EmployeeId && lr.StartDate == dto.StartDate && lr.EndDate == dto.EndDate).ToListAsync();
+            if(existingLeaveReq.Any())            
             {
                 return new ServiceResult
                 {
@@ -94,11 +134,25 @@ namespace LeaveManagementAPI.Services
                 StartDate = dto.StartDate,
                 EndDate = dto.EndDate,
                 Reason = dto.Reason,
-                Status = "Pending"
+                Status = "Pending",
+                ManagerId = await _context.Employees.Where(e => e.Id == dto.EmployeeId).Select(e => e.ManagerId).FirstOrDefaultAsync()
             };
-        
             _context.LeaveRequests.Add(leaveRequest);
             await _context.SaveChangesAsync();
+            // var leaveDays = (dto.EndDate - dto.StartDate).Days + 1;
+
+            // var leaveBalance = await _context.LeaveBalances
+            //     .FirstOrDefaultAsync(lb =>
+            //         lb.EmployeeId == dto.EmployeeId &&
+            //         lb.LeaveTypeId == dto.LeaveTypeId);
+
+            // if (leaveBalance != null)
+            // {
+            //     leaveBalance.RemainingDays -= leaveDays;
+            //     leaveBalance.UsedDays += leaveDays;
+
+            //     await _context.SaveChangesAsync();
+            // }
             return new ServiceResult
             {
                 Success = true,
@@ -120,6 +174,30 @@ namespace LeaveManagementAPI.Services
             }
 
             existingLeaveRequest.Status = updateDto.Status;
+            if (updateDto.Status != "Approved" && updateDto.Status != "Rejected")
+            {
+                return new ServiceResult
+                {
+                    Success = false,
+                    Message = "Invalid leave request status"
+                };
+            }
+            if (updateDto.Status == "Approved")
+            {
+                var leaveDays = (existingLeaveRequest.EndDate - existingLeaveRequest.StartDate).Days + 1;
+
+                var leaveBalance = await _context.LeaveBalances
+                    .FirstOrDefaultAsync(lb =>
+                        lb.EmployeeId == existingLeaveRequest.EmployeeId &&
+                        lb.LeaveTypeId == existingLeaveRequest.LeaveTypeId);
+
+                if (leaveBalance != null)
+                {
+                    leaveBalance.RemainingDays -= leaveDays;
+                    leaveBalance.UsedDays += leaveDays;
+                }
+            }
+
             await _context.SaveChangesAsync();
 
             return new ServiceResult
@@ -150,6 +228,72 @@ namespace LeaveManagementAPI.Services
                 Message = "Leave request deleted successfully"
             };
         }
+        public async Task<ServiceResult> GetLeaveRequestsByManagerIdAsync(int managerId)
+        {
+            var leaveRequests = await _context.LeaveRequests
+                .Where(lr => lr.ManagerId == managerId)
+                .Select(lr => new
+                {
+                    lr.Id,
+                    lr.EmployeeId,
+                    Employee = new
+                    {
+                        lr.Employee.Name
+                    },
+                    LeaveType = new
+                    {
+                        lr.LeaveType.TypeName
+                    },
+                    lr.StartDate,
+                    lr.EndDate,
+                    lr.Reason,
+                    lr.Status,
+                    lr.CreatedAt
+                })
+                .ToListAsync();
+
+            return new ServiceResult
+            {
+                Success = true,
+                Message = "Manager leave requests retrieved successfully",
+                Data = leaveRequests
+            };
+        }
+        public async Task<ServiceResult> GetLeaveRequestByRequestIdAsync(int reqId)
+        {
+            var leaveRequests = await _context.LeaveRequests
+                .Where(lr => lr.Id == reqId)
+                .Select(lr => new
+                {
+                    lr.Id,
+                    lr.EmployeeId,
+                    LeaveType = new
+                    {
+                        lr.LeaveType.TypeName
+                    },
+                    lr.StartDate,
+                    lr.EndDate,
+                    lr.Reason,
+                    lr.Status,
+                    lr.CreatedAt
+                })
+                .ToListAsync();
+            if (!leaveRequests.Any())
+            {
+                return new ServiceResult
+                {
+                    Success = false,
+                    Message = "Leave request not found"
+                };
+            }
+            return new ServiceResult
+            {
+                Success = true,
+                Message = "Employee leave requests retrieved successfully",
+                Data = leaveRequests
+            };
+        }
     }
+    
 }        
                 

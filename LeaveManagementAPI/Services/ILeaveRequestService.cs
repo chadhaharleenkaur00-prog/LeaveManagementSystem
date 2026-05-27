@@ -10,5 +10,7 @@ namespace LeaveManagementAPI.Services
         Task<ServiceResult> CreateLeaveRequestAsync(LeaveRequestDTO dto);
         Task<ServiceResult> UpdateLeaveRequestStatusAsync(UpdateLeaveRequestStatusDTO updateDto);
         Task<ServiceResult> DeleteLeaveRequestAsync(int id);
+        Task<ServiceResult> GetLeaveRequestsByManagerIdAsync(int managerId);
+        Task<ServiceResult> GetLeaveRequestByRequestIdAsync(int leaveRequestId);
     }
 }

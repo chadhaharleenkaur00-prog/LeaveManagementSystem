@@ -3,11 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 using LeaveManagementAPI.DTOs;      
 using LeaveManagementAPI.Models;
 using LeaveManagementAPI.Data;
-
+using Microsoft.AspNetCore.Authorization;
 namespace LeaveManagementAPI.Controller
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class LeaveBalanceController : ControllerBase
     {
         private readonly ILeaveBalanceService _leaveBalanceService;
@@ -32,6 +33,16 @@ namespace LeaveManagementAPI.Controller
         public async Task<IActionResult> GetLeaveBalanceById(int id)
         {
             var result = await _leaveBalanceService.GetLeaveBalanceByIdAsync(id);
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+            return NotFound(result);
+        }
+        [HttpGet("employee/{employeeId}")]
+        public async Task<IActionResult> GetLeaveBalanceByEmployeeId(int employeeId)
+        {
+            var result = await _leaveBalanceService.GetLeaveBalanceByEmployeeIdAsync(employeeId);
             if (result.Success)
             {
                 return Ok(result);

@@ -1,11 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
 using LeaveManagementAPI.DTOs;
 using LeaveManagementAPI.Services;
+using Microsoft.AspNetCore.Authorization;
 
-namespace LeaveManagementAPI.Controller
+namespace LeaveManagementAPI.Controllers
 {
     [ApiController]
-    [Route("employee/[controller]")]
+    [Route("api/[controller]")]
+    [Authorize]
     public class EmployeeController : ControllerBase
     {
 
@@ -54,6 +56,14 @@ namespace LeaveManagementAPI.Controller
                 return Ok(result.Data);}
             return BadRequest(result.Message);
         }
+        [HttpPost]
+        public async Task<IActionResult> CreateEmployee(CreateDto dto)
+        {
+            var result = await _employeeService.CreateEmployeeAsync(dto);
+            if (result.Success)            {
+                return Ok(result.Data);}
+            return BadRequest(result.Message);  
     }
+}
 }
     

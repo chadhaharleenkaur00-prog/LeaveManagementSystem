@@ -66,7 +66,35 @@ namespace LeaveManagementAPI.Services
                 };
             }
         }
-
+        public async Task<ServiceResult> GetLeaveBalanceByEmployeeIdAsync(int employeeId)
+        {
+            if (_context.LeaveBalances is null)
+            {
+                return new ServiceResult
+                {
+                    Success = false,
+                    Message = "No leave balances found"
+                };
+            }
+            else
+            {
+                var leaveBalances = await _context.LeaveBalances.Include(lb => lb.LeaveType).Where(lb => lb.EmployeeId == employeeId).ToListAsync();
+                if (leaveBalances is null || leaveBalances.Count == 0)
+                {
+                    return new ServiceResult
+                    {
+                        Success = false,
+                        Message = "Leave balances not found for the employee"
+                    };
+                }
+                return new ServiceResult
+                {
+                    Success = true,
+                    Message = "Leave balances retrieved successfully",
+                    Data = leaveBalances
+                };
+            }
+        }
         public async Task<ServiceResult> CreateLeaveBalanceAsync(LeaveBalanceDTO dto)
         {
             var existingLeaveBalance = await _context.LeaveBalances.FirstOrDefaultAsync(lb => lb.EmployeeId == dto.EmployeeId && lb.LeaveTypeId == dto.LeaveTypeId);
@@ -138,6 +166,7 @@ namespace LeaveManagementAPI.Services
                 Message = "Leave balance deleted successfully"
             };
          }   
+         
     }   
 }   
 

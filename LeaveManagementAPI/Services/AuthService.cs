@@ -39,6 +39,7 @@ namespace LeaveManagementAPI.Services{
 
             _context.Employees.Add(employee);
             await _context.SaveChangesAsync();
+            
 
             return new ServiceResult 
             { 
@@ -55,7 +56,12 @@ namespace LeaveManagementAPI.Services{
                 {
                     Success = false,
                     Message = "Invalid email or password",
-                    Token = null
+                    Token = null,
+                    Name = null,
+                    EmployeeId = 0,
+                    Email = null,
+                    Designation = null,
+                    Role = null
                 };
             } 
             else 
@@ -65,7 +71,12 @@ namespace LeaveManagementAPI.Services{
                 {
                     Success = true,
                     Message = "Login successful",
-                    Token = token
+                    Token = token,
+                    Name = employee.Name,  
+                    EmployeeId = employee.Id,   
+                    Email = employee.Email,
+                    Designation = employee.Designation,
+                    Role = employee.Role
                 };
             } 
 

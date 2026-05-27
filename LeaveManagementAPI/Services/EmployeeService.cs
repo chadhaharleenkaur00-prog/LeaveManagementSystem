@@ -136,6 +136,63 @@ namespace LeaveManagementAPI.Services
                 }
             }
     }
+    public async Task<ServiceResult> CreateEmployeeAsync(CreateDto dto)
+        {
+            if(_context.Employees.Any(e => e.Email == dto.Email))
+            {
+                return new ServiceResult
+                {
+                    Success = false,
+                    Message = "Email already exists"
+                };
+            }   
+                var employee = new Employee
+                {
+                    Name = dto.Name,
+                    Email = dto.Email,
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
+                    Designation = dto.Designation,
+                    ManagerId = dto.ManagerId,
+                    Role = dto.Designation,
+                };
 
+                if (dto.ManagerId.HasValue)
+
+                {
+                    var managerExists = await _context.Employees
+                        .AnyAsync(e => e.Id == dto.ManagerId.Value && e.Role == "Manager");
+
+                    if (!managerExists)
+                    {
+                        return new ServiceResult
+                        {
+                            Success = false,
+                            Message = "Selected manager is invalid"
+                        };
+                    }
+                }
+
+                _context.Employees.Add(employee);
+                await _context.SaveChangesAsync();
+
+                var leaveBalances = new List<LeaveBalance>
+                {
+                    new LeaveBalance { EmployeeId = employee.Id, LeaveTypeId = 1, RemainingDays = 10 },
+                    new LeaveBalance { EmployeeId = employee.Id, LeaveTypeId = 2, RemainingDays = 12 },
+                    new LeaveBalance { EmployeeId = employee.Id, LeaveTypeId = 3, RemainingDays = 15 }
+                };
+
+                _context.LeaveBalances.AddRange(leaveBalances);
+                await _context.SaveChangesAsync();
+
+                return new ServiceResult
+                {
+                    Success = true,
+                    Message = "Employee has been created",
+                    Data = employee
+                };
+            
+
+}
 }
 }

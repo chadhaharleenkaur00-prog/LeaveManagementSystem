@@ -8,6 +8,7 @@ namespace LeaveManagementAPI.Controller{
 
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class LeaveTypesController : ControllerBase
     {
         private readonly ILeaveTypeService _leaveTypeService;
@@ -17,7 +18,6 @@ namespace LeaveManagementAPI.Controller{
             _leaveTypeService = leaveTypeService;
         }
 
-        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetLeaveTypes()
         {

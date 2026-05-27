@@ -36,6 +36,12 @@ namespace LeaveManagementAPI.DTOs
         public bool Success { get; set; }
         public string Message { get; set; }
         public string Token { get; set; }
+        public string Name { get; set; } 
+        public int EmployeeId { get; set; }
+        public string Email { get; set; }
+        public string Designation { get; set; }
+        public string Role { get; set; }
+
     }
     public class LeaveRequestDTO
     {
@@ -48,8 +54,9 @@ namespace LeaveManagementAPI.DTOs
     public class UpdateLeaveRequestStatusDTO
     {
         public int id { get; set; }
-        public string Status { get; set; }
-    }
+        public string Status { get; set; } = string.Empty;
+}
+    
     public class LeaveBalanceDTO
     {
         public int EmployeeId { get; set; }
@@ -62,6 +69,15 @@ namespace LeaveManagementAPI.DTOs
     {
         public int Id { get; set; }
         public int RemainingDays { get; set; }
+    }
+    public class CreateDto
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+        public string Designation { get; set; } = string.Empty;
+        public int? ManagerId { get; set; }
+
     }
 }
 

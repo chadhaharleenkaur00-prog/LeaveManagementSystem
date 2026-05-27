@@ -8,5 +8,6 @@ namespace LeaveManagementAPI.Services
         Task<ServiceResult> GetEmployeeByIdAsync(int id);
         Task<ServiceResult> UpdateEmployeeByIdAsync(int id, UpdateDto dto);
         Task<ServiceResult> DeleteEmployeeByIdAsync(int id);
+        Task<ServiceResult> CreateEmployeeAsync(CreateDto dto);
     }
 }

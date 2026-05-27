@@ -14,5 +14,7 @@ namespace LeaveManagementAPI.Models {
         public string Designation { get; set; } = string.Empty;
         public string Role { get; set; } = "Employee";
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public int? ManagerId { get; set; }
+        public Employee? Manager { get; set; }
     }
 }

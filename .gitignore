@@ -1,0 +1,14 @@
+# .NET build output
+bin/
+obj/
+
+# Local environment files
+.env
+.env.local
+LeaveManagementAPI/appsettings.json
+LeaveManagementAPI/appsettings.Development.json
+
+# OS/editor files
+.DS_Store
+.vscode/
+.idea/
